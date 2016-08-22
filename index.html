@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <title>間違い探し</title>
+</head>
+<body>
+    <h1>間違い探し</h1>
+    <p><input type="button" value="start!" onclick="gameStart();"></p>
+    <p id="score"></p>
+    <div id="cells"></div>
+    <script>
+        var level = 0;
+        var games = [
+            ['a', '🌠'],
+            ['c', '🌠'],
+            ['e', '🌠']
+        ];
+        var MAX_LEVEL = games.length - 1;
+        var DIM_FIRST = 5;
+        var DIM_DELTA = 3;
+        var dim;
+        var t1;
+        var t2;
+
+        function gameStart() {
+            var dummy = games[level][0];
+            var ans = games[level][1];
+
+            if (level === 0) {
+                dim = DIM_FIRST;
+                $("#score").empty();
+                t1 = new Date().getTime();
+            }
+
+            // span要素を正方形に並べる
+            var cells = "";
+            for (var i = 1; i <= dim * dim; i++) {
+                cells += "<span id='s" + i + "'></span>";
+                if (i % dim === 0) {
+                    cells += "<br>";
+                }
+            }
+            $("#cells").html(cells);
+
+            // 配列を dummy で埋める
+            var chrs = [];
+            for (var i = 0; i < dim * dim; i++) {
+                chrs.push(dummy);
+            }
+
+            // 1文字だけ ans に変える
+            var pos = Math.floor(Math.random() * chrs.length);
+            chrs[pos] = ans;
+
+            // span要素に配列の中身を入れる
+            for (var i = 1; i <= chrs.length; i++) {
+                $("#s" + i).text(chrs[i - 1]);
+                $("#s" + i).click(function() {
+                    if ($(this).text() === ans) {
+                        level++
+                        dim += DIM_DELTA;
+                        if (level > MAX_LEVEL) {
+                            t2 = new Date().getTime();
+                            $("#score").text("Your score is " + (t2 - t1) / 1000 + "!");
+                            level = 0;
+                            return false;
+                        }
+                        gameStart();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
